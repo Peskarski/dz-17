@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.8986bff4.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <title>Document</title>
+<script src="styles.8986bff4.js"></script></head>
+
+<body>
+  <div class="container">
+    <div class="container-header">
+      <h2>Дневник</h2>
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        Создать пост
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Новый пост</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form novalidate="" id="addPost">
+                <div>
+                  <label for="postHeader">Заголовок</label>
+                  <input required="" maxlength="80" minlength="2" type="text" class="form-control" placeholder="" id="postHeader" name="title">
+                  <p class="alert">Поле обязательно для заполнения и должно быть от 2 до 80 символов</p>
+                  <label for="postContent">Содержание</label>
+                  <input required="" maxlength="1000" ,="" minlength="2" type="text" class="form-control" placeholder="" id="postContent" name="content">
+                  <p class="alert">Поле обязательно для заполнения и должно быть от 2 до 1000 символов</p>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+              <button form="addPost" type="submit" class="btn btn-primary" id="submitFormButton">Отправить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-body">
+    <div class="list-block">
+      <ul class="list">
+      </ul>
+    </div>
+    <div class="post post-no-display">
+      <div class="post-header"></div>
+      <div class="post-content"></div>
+    </div>
+  </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  <script src="app.c3f9f951.js"></script>
+</body>
+
+</html>
