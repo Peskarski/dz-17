@@ -13,7 +13,6 @@ export class List {
     this.listenShowContent();
   }
 
-
   render() {
     this.container.innerHTML = '';
     this.data.forEach((element) => {

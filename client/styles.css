@@ -63,6 +63,7 @@
 .post-content {
   margin-top: 16px;
   overflow: hidden;
+  height: 200px;
 }
 
 .active-item {
@@ -87,4 +88,8 @@
   display: block;
   color: red;
   font-size: small;
+}
+
+.edit-content {
+  float: right;
 }

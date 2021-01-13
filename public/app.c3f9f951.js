@@ -138,6 +138,10 @@ var Content = /*#__PURE__*/function () {
     this.container = container;
     this.post = post;
     this.url = '/api/data';
+    this.modal = new bootstrap.Modal(document.querySelector('.modal'), {
+      keyboard: false
+    });
+    this.data = {};
     this.init();
   }
 
@@ -149,9 +153,19 @@ var Content = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render(item) {
+      if (this.container.lastElementChild.classList.contains('btn-primary')) {
+        this.container.lastElementChild.remove();
+      }
+
       this.container.classList.remove('post-no-display');
       this.container.firstElementChild.innerHTML = "\n          <p>".concat(item.title, "</p>\n          <p>").concat(item.date, "</p>\n        ");
       this.container.lastElementChild.innerHTML = "\n          <p>".concat(item.content, "</p>\n        ");
+      var editButton = document.createElement('button');
+      editButton.textContent = 'Реадктировать';
+      editButton.classList.value = 'btn btn-primary edit-content';
+      editButton.dataset.id = this.post.id;
+      this.container.append(editButton);
+      this.listenEditPost();
     }
   }, {
     key: "getData",
@@ -166,8 +180,25 @@ var Content = /*#__PURE__*/function () {
         data.list.forEach(function (element) {
           if (element.id === _this.post.id) {
             _this.render(element);
+
+            _this.data = element;
           }
         });
+      });
+    }
+  }, {
+    key: "listenEditPost",
+    value: function listenEditPost() {
+      var _this2 = this;
+
+      document.querySelector('.edit-content').addEventListener('click', function () {
+        _this2.modal._element.dataset.method = 'PUT';
+        document.querySelector('#postHeader').value = _this2.data.title;
+        document.querySelector('#postContent').value = _this2.data.content;
+        document.querySelector('#metaId').value = _this2.data.id;
+        document.querySelector('#metaDate').value = _this2.data.date;
+
+        _this2.modal.show();
       });
     }
   }]);
@@ -305,10 +336,13 @@ var Form = /*#__PURE__*/function () {
         } else {
           _this.form.classList.remove('check-valid');
 
+          if (document.querySelector('.modal').dataset.method === 'POST') {
+            var currentDate = new Date();
+
+            _this.setMetaData(+currentDate, _this.formatDate(currentDate));
+          }
+
           var formData = new FormData(_this.form);
-          var currentDate = new Date();
-          formData.append('id', currentDate.getTime());
-          formData.append('date', _this.formatDate(currentDate));
           formData.forEach(function (value, key) {
             data[key] = value;
           });
@@ -324,8 +358,11 @@ var Form = /*#__PURE__*/function () {
     value: function _send(data) {
       var _this2 = this;
 
-      fetch(this.url, {
-        method: 'POST',
+      var method = document.querySelector('.modal').dataset.method;
+      var url = '';
+      method === 'POST' ? url = this.url : url = this.url + "/".concat(data.id);
+      fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
         },
@@ -349,6 +386,12 @@ var Form = /*#__PURE__*/function () {
       var result = "".concat(day, ".").concat(month, ".").concat(year, "  ").concat(hours, ":").concat(minutes);
       return result;
     }
+  }, {
+    key: "setMetaData",
+    value: function setMetaData(id, date) {
+      document.querySelector('#metaId').value = id;
+      document.querySelector('#metaDate').value = date;
+    }
   }]);
 
   return Form;
@@ -360,6 +403,9 @@ exports.Form = Form;
 
 var _form = require("./form.js");
 
+document.querySelector('#openModal').addEventListener('click', function () {
+  document.querySelector('.modal').dataset.method = 'POST';
+});
 var formEl = document.querySelector('#addPost');
 var form = new _form.Form(formEl);
 },{"./form.js":"js/form.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -390,7 +436,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62831" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60665" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

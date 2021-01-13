@@ -15,7 +15,7 @@
     <div class="container-header">
       <h2>Дневник</h2>
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" id="openModal">
         Создать пост
       </button>
 
@@ -37,6 +37,9 @@
                   <label for="postContent">Содержание</label>
                   <input required maxlength = "1000", minlength = "2" type="text" class="form-control" placeholder="" id="postContent" name="content">
                   <p class="alert">Поле обязательно для заполнения и должно быть от 2 до 1000 символов</p>
+                  <input type="hidden" name="id" id="metaId">
+                  <input type="hidden" name="date" id = "metaDate">
+
                 </div>
               </form>
             </div>

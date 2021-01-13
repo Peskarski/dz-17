@@ -23,10 +23,11 @@ export class Form {
       } else {
         this.form.classList.remove('check-valid');
 
+        if (document.querySelector('.modal').dataset.method === 'POST') {
+          const currentDate = new Date();
+          this.setMetaData(+currentDate, this.formatDate(currentDate));
+        }
         const formData = new FormData(this.form);
-        const currentDate = new Date();
-        formData.append('id', currentDate.getTime());
-        formData.append('date', this.formatDate(currentDate));
         formData.forEach((value, key) => {
           data[key] = value;
         });
@@ -37,8 +38,11 @@ export class Form {
   }
 
   _send(data) {
-    fetch(this.url, {
-      method: 'POST',
+    let method = document.querySelector('.modal').dataset.method;
+    let url = '';
+    method === 'POST' ? url = this.url : url = this.url + `/${data.id}`;
+    fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json;charset=utf-8' },
       body: JSON.stringify(data),
     })
@@ -59,4 +63,8 @@ export class Form {
     return result;
   }
 
+  setMetaData(id, date) {
+    document.querySelector('#metaId').value = id;
+    document.querySelector('#metaDate').value = date;
+  }
 }
