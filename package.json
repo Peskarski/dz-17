@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "browserslist": [
+    "last 1 Chrome versions"
+  ],
   "scripts": {
     "dev": "parcel client/index.html -d public --public-url ./",
     "build": "parcel build client/index.html -d public --public-url ./",

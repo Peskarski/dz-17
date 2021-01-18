@@ -1,12 +1,13 @@
+import { List } from './list.js';
+
 export class Content {
   constructor(container, post) {
     this.container = container;
     this.post = post;
     this.url = '/api/data';
-    this.modal = new bootstrap.Modal(document.querySelector('.modal'), {
-      keyboard: false
-    });
+    this.modal = new bootstrap.Modal(document.querySelector('.modal'));
     this.data = {};
+    this.listContainer = document.querySelector('.list');
     this.init();
   }
 
@@ -15,8 +16,9 @@ export class Content {
   }
 
   render(item) {
-    if (this.container.lastElementChild.classList.contains('btn-primary')) {
-      this.container.lastElementChild.remove()
+    if (this.container.lastElementChild.classList.contains('btn')) {
+      this.container.lastElementChild.remove();
+      this.container.lastElementChild.remove();
     }
 
     this.container.classList.remove('post-no-display');
@@ -33,7 +35,14 @@ export class Content {
     editButton.dataset.id = this.post.id;
     this.container.append(editButton);
 
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Удалить';
+    deleteButton.classList.value = 'btn btn-danger delete-content';
+    deleteButton.id = this.post.id;
+    this.container.append(deleteButton);
+
     this.listenEditPost();
+    this.listenDeletePost();
   }
 
   getData() {
@@ -60,5 +69,25 @@ export class Content {
       document.querySelector('#metaDate').value = this.data.date;
       this.modal.show();
     });
+  }
+
+  listenDeletePost() {
+    document.querySelector('.delete-content').addEventListener('click', (e) => {
+      const id = e.target.id;
+      const toDelete = confirm('Вы действительно хотите удалить пост?');
+      if (toDelete) {
+      this.deletePost(id);
+      }
+    });
+  }
+
+  deletePost(id) {
+    return fetch(this.url + `/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json;charset=utf-8' },
+    })
+    .then((response) => response.json())
+    .then((data) => new List(this.listContainer, data.list))
+    .catch((error) => console.error(error));
   }
 }

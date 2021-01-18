@@ -125,89 +125,99 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Content = void 0;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _list = require("./list.js");
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Content = /*#__PURE__*/function () {
-  function Content(container, post) {
-    _classCallCheck(this, Content);
-
+class Content {
+  constructor(container, post) {
     this.container = container;
     this.post = post;
     this.url = '/api/data';
-    this.modal = new bootstrap.Modal(document.querySelector('.modal'), {
-      keyboard: false
-    });
+    this.modal = new bootstrap.Modal(document.querySelector('.modal'));
     this.data = {};
+    this.listContainer = document.querySelector('.list');
     this.init();
   }
 
-  _createClass(Content, [{
-    key: "init",
-    value: function init() {
-      this.getData();
+  init() {
+    this.getData();
+  }
+
+  render(item) {
+    if (this.container.lastElementChild.classList.contains('btn')) {
+      this.container.lastElementChild.remove();
+      this.container.lastElementChild.remove();
     }
-  }, {
-    key: "render",
-    value: function render(item) {
-      if (this.container.lastElementChild.classList.contains('btn-primary')) {
-        this.container.lastElementChild.remove();
+
+    this.container.classList.remove('post-no-display');
+    this.container.firstElementChild.innerHTML = `
+          <p>${item.title}</p>
+          <p>${item.date}</p>
+        `;
+    this.container.lastElementChild.innerHTML = `
+          <p>${item.content}</p>
+        `;
+    const editButton = document.createElement('button');
+    editButton.textContent = 'Реадктировать';
+    editButton.classList.value = 'btn btn-primary edit-content';
+    editButton.dataset.id = this.post.id;
+    this.container.append(editButton);
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Удалить';
+    deleteButton.classList.value = 'btn btn-danger delete-content';
+    deleteButton.id = this.post.id;
+    this.container.append(deleteButton);
+    this.listenEditPost();
+    this.listenDeletePost();
+  }
+
+  getData() {
+    return fetch(this.url, {
+      method: 'GET'
+    }).then(response => response.json()).then(data => {
+      data.list.forEach(element => {
+        if (element.id === this.post.id) {
+          this.render(element);
+          this.data = element;
+        }
+      });
+    });
+  }
+
+  listenEditPost() {
+    document.querySelector('.edit-content').addEventListener('click', () => {
+      this.modal._element.dataset.method = 'PUT';
+      document.querySelector('#postHeader').value = this.data.title;
+      document.querySelector('#postContent').value = this.data.content;
+      document.querySelector('#metaId').value = this.data.id;
+      document.querySelector('#metaDate').value = this.data.date;
+      this.modal.show();
+    });
+  }
+
+  listenDeletePost() {
+    document.querySelector('.delete-content').addEventListener('click', e => {
+      const id = e.target.id;
+      const toDelete = confirm('Вы действительно хотите удалить пост?');
+
+      if (toDelete) {
+        this.deletePost(id);
       }
+    });
+  }
 
-      this.container.classList.remove('post-no-display');
-      this.container.firstElementChild.innerHTML = "\n          <p>".concat(item.title, "</p>\n          <p>").concat(item.date, "</p>\n        ");
-      this.container.lastElementChild.innerHTML = "\n          <p>".concat(item.content, "</p>\n        ");
-      var editButton = document.createElement('button');
-      editButton.textContent = 'Реадктировать';
-      editButton.classList.value = 'btn btn-primary edit-content';
-      editButton.dataset.id = this.post.id;
-      this.container.append(editButton);
-      this.listenEditPost();
-    }
-  }, {
-    key: "getData",
-    value: function getData() {
-      var _this = this;
+  deletePost(id) {
+    return fetch(this.url + `/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      }
+    }).then(response => response.json()).then(data => new _list.List(this.listContainer, data.list)).catch(error => console.error(error));
+  }
 
-      return fetch(this.url, {
-        method: 'GET'
-      }).then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        data.list.forEach(function (element) {
-          if (element.id === _this.post.id) {
-            _this.render(element);
-
-            _this.data = element;
-          }
-        });
-      });
-    }
-  }, {
-    key: "listenEditPost",
-    value: function listenEditPost() {
-      var _this2 = this;
-
-      document.querySelector('.edit-content').addEventListener('click', function () {
-        _this2.modal._element.dataset.method = 'PUT';
-        document.querySelector('#postHeader').value = _this2.data.title;
-        document.querySelector('#postContent').value = _this2.data.content;
-        document.querySelector('#metaId').value = _this2.data.id;
-        document.querySelector('#metaDate').value = _this2.data.date;
-
-        _this2.modal.show();
-      });
-    }
-  }]);
-
-  return Content;
-}();
+}
 
 exports.Content = Content;
-},{}],"js/list.js":[function(require,module,exports) {
+},{"./list.js":"js/list.js"}],"js/list.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -217,76 +227,57 @@ exports.List = void 0;
 
 var _content = require("./content.js");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var List = /*#__PURE__*/function () {
-  function List(container, data) {
-    _classCallCheck(this, List);
-
+class List {
+  constructor(container, data) {
     this.container = container;
     this.data = data;
     this.ulr = '/api/data';
     this.init();
   }
 
-  _createClass(List, [{
-    key: "init",
-    value: function init() {
-      this.render();
-      this.listenShowContent();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this = this;
+  init() {
+    this.render();
+    this.listenShowContent();
+  }
 
-      this.container.innerHTML = '';
-      this.data.forEach(function (element) {
-        var listItem = document.createElement('li');
-        listItem.id = element.id;
-        listItem.innerHTML = "\n      <p>".concat(element.title, "</p>\n      <p>").concat(element.date, "</p>\n      ");
-        listItem.classList.add('list-item');
+  render() {
+    this.container.innerHTML = '';
+    this.data.forEach(element => {
+      const listItem = document.createElement('li');
+      listItem.id = element.id;
+      listItem.innerHTML = `
+      <p>${element.title}</p>
+      <p>${element.date}</p>
+      `;
+      listItem.classList.add('list-item');
+      this.container.append(listItem);
+    });
+  }
 
-        _this.container.append(listItem);
-      });
+  showContent(item) {
+    const container = document.querySelector('.post');
+    const content = new _content.Content(container, item);
+  }
+
+  showActiveItem(item) {
+    if (document.querySelector('.active-item')) {
+      document.querySelector('.active-item').classList.remove('active-item');
+      item.classList.add('active-item');
+    } else {
+      item.classList.add('active-item');
     }
-  }, {
-    key: "showContent",
-    value: function showContent(item) {
-      var container = document.querySelector('.post');
-      var content = new _content.Content(container, item);
-    }
-  }, {
-    key: "showActiveItem",
-    value: function showActiveItem(item) {
-      if (document.querySelector('.active-item')) {
-        document.querySelector('.active-item').classList.remove('active-item');
-        item.classList.add('active-item');
-      } else {
-        item.classList.add('active-item');
+  }
+
+  listenShowContent() {
+    this.container.addEventListener('click', e => {
+      if (e.target.classList.contains('list-item')) {
+        this.showActiveItem(e.target);
+        this.showContent(e.target);
       }
-    }
-  }, {
-    key: "listenShowContent",
-    value: function listenShowContent() {
-      var _this2 = this;
+    });
+  }
 
-      this.container.addEventListener('click', function (e) {
-        if (e.target.classList.contains('list-item')) {
-          _this2.showActiveItem(e.target);
-
-          _this2.showContent(e.target);
-        }
-      });
-    }
-  }]);
-
-  return List;
-}();
+}
 
 exports.List = List;
 },{"./content.js":"js/content.js"}],"js/form.js":[function(require,module,exports) {
@@ -299,103 +290,75 @@ exports.Form = void 0;
 
 var _list = require("./list");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Form = /*#__PURE__*/function () {
-  function Form(form) {
-    _classCallCheck(this, Form);
-
+class Form {
+  constructor(form) {
     this.form = form;
     this.url = '/api/data';
     this.init();
     this.listContainer = document.querySelector('.list');
   }
 
-  _createClass(Form, [{
-    key: "init",
-    value: function init() {
-      this.listenSubmitForm();
-    }
-  }, {
-    key: "listenSubmitForm",
-    value: function listenSubmitForm() {
-      var _this = this;
+  init() {
+    this.listenSubmitForm();
+  }
 
-      this.form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var data = {};
+  listenSubmitForm() {
+    this.form.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = {};
+      const isValid = this.form.checkValidity();
 
-        var isValid = _this.form.checkValidity();
+      if (!isValid) {
+        this.form.classList.add('check-valid');
+      } else {
+        this.form.classList.remove('check-valid');
 
-        if (!isValid) {
-          _this.form.classList.add('check-valid');
-        } else {
-          _this.form.classList.remove('check-valid');
-
-          if (document.querySelector('.modal').dataset.method === 'POST') {
-            var currentDate = new Date();
-
-            _this.setMetaData(+currentDate, _this.formatDate(currentDate));
-          }
-
-          var formData = new FormData(_this.form);
-          formData.forEach(function (value, key) {
-            data[key] = value;
-          });
-
-          _this._send(data);
-
-          _this.form.reset();
+        if (document.querySelector('.modal').dataset.method === 'POST') {
+          const currentDate = new Date();
+          this.setMetaData(+currentDate, this.formatDate(currentDate));
         }
-      });
-    }
-  }, {
-    key: "_send",
-    value: function _send(data) {
-      var _this2 = this;
 
-      var method = document.querySelector('.modal').dataset.method;
-      var url = '';
-      method === 'POST' ? url = this.url : url = this.url + "/".concat(data.id);
-      fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(data)
-      }).then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        return new _list.List(_this2.listContainer, data.list);
-      }).catch(function (error) {
-        return console.error(error);
-      });
-    }
-  }, {
-    key: "formatDate",
-    value: function formatDate(date) {
-      var day = date.getDate() > 9 ? date.getDate() : '0' + date.getDate();
-      var month = date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1);
-      var year = date.getFullYear();
-      var hours = date.getHours() > 9 ? date.getHours() : '0' + date.getHours();
-      var minutes = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes();
-      var result = "".concat(day, ".").concat(month, ".").concat(year, "  ").concat(hours, ":").concat(minutes);
-      return result;
-    }
-  }, {
-    key: "setMetaData",
-    value: function setMetaData(id, date) {
-      document.querySelector('#metaId').value = id;
-      document.querySelector('#metaDate').value = date;
-    }
-  }]);
+        const formData = new FormData(this.form);
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
 
-  return Form;
-}();
+        this._send(data);
+
+        this.form.reset();
+      }
+    });
+  }
+
+  _send(data) {
+    let method = document.querySelector('.modal').dataset.method;
+    let url = '';
+    method === 'POST' ? url = this.url : url = this.url + `/${data.id}`;
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(data)
+    }).then(response => response.json()).then(data => new _list.List(this.listContainer, data.list)).catch(error => console.error(error));
+  }
+
+  formatDate(date) {
+    const day = date.getDate() > 9 ? date.getDate() : '0' + date.getDate();
+    const month = date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1);
+    const year = date.getFullYear();
+    const hours = date.getHours() > 9 ? date.getHours() : '0' + date.getHours();
+    const minutes = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes();
+    const result = `${day}.${month}.${year}  ${hours}:${minutes}`;
+    return result;
+  }
+
+  setMetaData(id, date) {
+    document.querySelector('#metaId').value = id;
+    document.querySelector('#metaDate').value = date;
+  }
+
+}
 
 exports.Form = Form;
 },{"./list":"js/list.js"}],"js/app.js":[function(require,module,exports) {
@@ -403,11 +366,11 @@ exports.Form = Form;
 
 var _form = require("./form.js");
 
-document.querySelector('#openModal').addEventListener('click', function () {
+document.querySelector('#openModal').addEventListener('click', () => {
   document.querySelector('.modal').dataset.method = 'POST';
 });
-var formEl = document.querySelector('#addPost');
-var form = new _form.Form(formEl);
+const formEl = document.querySelector('#addPost');
+const form = new _form.Form(formEl);
 },{"./form.js":"js/form.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -436,7 +399,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60665" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50825" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

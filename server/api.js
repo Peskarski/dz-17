@@ -39,4 +39,23 @@ router.put('/:id', (req, res, next) => {
   });
 });
 
+router.delete('/:id', function (req, res, next) {
+  var id = req.params.id;
+
+  var arr = [...data.list];
+  var newArr = arr.filter((item) => {
+    if (item.id == id) {
+      return false;
+    }
+
+    return true;
+  });
+  data.list = newArr;
+
+  fs.writeFile('./data.json', JSON.stringify(data), function (err) {
+    if (err) throw err;
+    res.send(JSON.stringify(data));
+  });
+});
+
 module.exports = router;
